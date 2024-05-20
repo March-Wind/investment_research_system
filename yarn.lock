@@ -50,6 +50,28 @@
     ora "5.4.1"
     rxjs "7.8.1"
 
+"@antv/x6-common@^2.0.16":
+  version "2.0.17"
+  resolved "https://registry.npmmirror.com/@antv/x6-common/-/x6-common-2.0.17.tgz#a40a0920859faadf567452dea81132783a19aaa4"
+  integrity sha512-37g7vmRkNdYzZPdwjaMSZEGv/MMH0S4r70/Jwoab1mioycmuIBN73iyziX8m56BvJSDucZ3J/6DU07otWqzS6A==
+  dependencies:
+    lodash-es "^4.17.15"
+    utility-types "^3.10.0"
+
+"@antv/x6-geometry@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.npmmirror.com/@antv/x6-geometry/-/x6-geometry-2.0.5.tgz#c158317d74135bedd78c2fdeb76f9c7cfa0ef0aa"
+  integrity sha512-MId6riEQkxphBpVeTcL4ZNXL4lScyvDEPLyIafvWMcWNTGK0jgkK7N20XSzqt8ltJb0mGUso5s56mrk8ysHu2A==
+
+"@antv/x6@^2.18.1":
+  version "2.18.1"
+  resolved "https://registry.npmmirror.com/@antv/x6/-/x6-2.18.1.tgz#4f3fab8c24119ca5f83583188657fc243cc5a0bc"
+  integrity sha512-FkWdbLOpN9J7dfJ+kiBxzowSx2N6syBily13NMVdMs+wqC6Eo5sLXWCZjQHateTFWgFw7ZGi2y9o3Pmdov1sXw==
+  dependencies:
+    "@antv/x6-common" "^2.0.16"
+    "@antv/x6-geometry" "^2.0.5"
+    utility-types "^3.10.0"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.16.7", "@babel/code-frame@^7.23.5", "@babel/code-frame@^7.24.1", "@babel/code-frame@^7.24.2":
   version "7.24.2"
   resolved "https://registry.npmmirror.com/@babel/code-frame/-/code-frame-7.24.2.tgz#718b4b19841809a58b29b68cde80bc5e1aa6d9ae"
@@ -3690,6 +3712,11 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+lodash-es@^4.17.15:
+  version "4.17.21"
+  resolved "https://registry.npmmirror.com/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
+
 lodash.includes@^4.3.0:
   version "4.3.0"
   resolved "https://registry.npmmirror.com/lodash.includes/-/lodash.includes-4.3.0.tgz#60bb98a87cb923c68ca1e51325483314849f553f"
@@ -5136,6 +5163,11 @@ util-deprecate@^1.0.1, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.npmmirror.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
+
+utility-types@^3.10.0:
+  version "3.11.0"
+  resolved "https://registry.npmmirror.com/utility-types/-/utility-types-3.11.0.tgz#607c40edb4f258915e901ea7995607fdf319424c"
+  integrity sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==
 
 utils-merge@1.0.1:
   version "1.0.1"

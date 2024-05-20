@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "debug": "node --inspect-brk dist/main",
+    "debug": "node --inspect-brk dist/main.mjs",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -19,11 +19,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "find": "node ./dist/scripts/insert_token.js",
+    "find": "node   ./dist/scripts/insert_token.js",
     "test_chat": "node  --inspect-brk ./dist/scripts/test_chat.js",
     "test_json": "node  --inspect-brk ./dist/scripts/test_json.js"
   },
   "dependencies": {
+    "@antv/x6": "^2.18.1",
     "@dqbd/tiktoken": "^1.0.13",
     "@marchyang/enhanced_promise": "^1.2.5",
     "@marchyang/lib-core": "^1.0.8",
@@ -41,7 +42,8 @@
     "openai": "^4.33.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "socks-proxy-agent": "^8.0.3"
+    "socks-proxy-agent": "^8.0.3",
+    "tapable": "^2.2.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

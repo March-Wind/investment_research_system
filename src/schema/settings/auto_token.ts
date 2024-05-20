@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type BaseDocument = HydratedDocument<Base>;
 export class Base {
-  @Prop()
+  @Prop({ required: true, index: true })
   key: string;
 
   @Prop()
@@ -67,6 +67,9 @@ export const TransferTokenSchema = SchemaFactory.createForClass(TransferToken);
 // 以后拓展
 @Schema()
 export class OpenAiToken extends Base {}
+
+export const OpenAiTokenSchema = SchemaFactory.createForClass(OpenAiToken);
+
 export const collectionName = 'auto_tokens';
 
 @Schema({
@@ -94,6 +97,7 @@ export const AutoTokenModule = MongooseModule.forFeature(
       discriminators: [
         { name: CopilotToken.name, schema: CopilotTokenSchema },
         { name: TransferToken.name, schema: TransferTokenSchema },
+        { name: OpenAiToken.name, schema: OpenAiTokenSchema },
       ],
     },
   ],

@@ -6,7 +6,7 @@ import type { ChatCompletionChunk, ChatCompletionMessageParam, ChatCompletionCre
 import type { Stream } from 'openai/src/streaming';
 import Tokens from './tokens';
 import { AutoTokenService } from './autoToken.service';
-import { CopilotToken, TransferToken, OpenAiToken } from '@/schema/settings/auto_token';
+import { CopilotToken, TransferToken, OpenAiToken, AutoToken } from '@/schema/settings/auto_token';
 import { randomString } from '@/utils/generatorNunmbers';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import type { ClientOptions } from 'openai';
@@ -51,10 +51,10 @@ class ChatService {
     frequency_penalty: 0,
     presence_penalty: 0,
   };
-  private tokenInfo: CopilotToken | TransferToken;
+  private tokenInfo: AutoToken;
   // @Inject(AutoTokenService)
   constructor(private autoTokenService: AutoTokenService) {}
-  async callOpenAi(body: ChatCompletionCreateParams, tokenInfo: CopilotToken | TransferToken | OpenAiToken) {
+  async callOpenAi(body: ChatCompletionCreateParams, tokenInfo: AutoToken) {
     // if (/gpt-4/.test(body.model)) {
     //   body.model = 'gpt-4-turbo-preview';
     // }
@@ -68,14 +68,14 @@ class ChatService {
     if (tokenType === 'copilot') {
       const requestId = randomString(8) + '-' + randomString(4) + '-' + randomString(4) + '-' + randomString(4) + '-' + randomString(12);
       const sessionid = randomString(8) + '-' + randomString(4) + '-' + randomString(4) + '-' + randomString(4) + '-' + randomString(25);
-      (tokenInfo as CopilotToken).headers['x-request-id'] = requestId;
-      (tokenInfo as CopilotToken).headers['vscode-sessionid'] = sessionid;
+      (tokenInfo as unknown as CopilotToken).headers['x-request-id'] = requestId;
+      (tokenInfo as unknown as CopilotToken).headers['vscode-sessionid'] = sessionid;
     }
-    if ((tokenInfo as CopilotToken)?.origin) {
-      params.baseURL = (tokenInfo as CopilotToken)?.origin;
+    if ((tokenInfo as unknown as CopilotToken)?.origin) {
+      params.baseURL = (tokenInfo as unknown as CopilotToken)?.origin;
     }
-    if ((tokenInfo as CopilotToken)?.headers) {
-      params.defaultHeaders = (tokenInfo as CopilotToken)?.headers;
+    if ((tokenInfo as unknown as CopilotToken)?.headers) {
+      params.defaultHeaders = (tokenInfo as unknown as CopilotToken)?.headers;
     }
     if (httpAgent && !params.baseURL) {
       params.httpAgent = httpAgent;
@@ -87,7 +87,7 @@ class ChatService {
       const controller = new AbortController();
       const timer = setTimeout(() => {
         controller.abort();
-      }, 80000);
+      }, 8000);
       const chatParams = {
         ...this.defaultOptions,
         ...body,
@@ -97,7 +97,7 @@ class ChatService {
       return openai.chat.completions
         .create(chatParams, {
           stream: chatParams.stream,
-          signal: controller.signal,
+          signal: chatParams.stream ? controller.signal : undefined,
         })
         .finally(() => {
           clearTimeout(timer);
@@ -160,7 +160,7 @@ class ChatService {
   }
   async close() {
     try {
-      this.tokenInfo?.tokenType === 'copilot' && (await this.autoTokenService.updateCopilotTokenState(this.tokenInfo));
+      await this.autoTokenService.updateCopilotTokenState(this.tokenInfo);
       // 多次调用好像会报错
       if (
         (this.resp as Stream<ChatCompletionChunk>)?.controller &&
@@ -202,8 +202,7 @@ class ChatService {
         return '';
       }
       case 'stop':
-        // 已经返回完整信息，正常结束
-        this.close();
+      // 已经返回完整信息，正常结束
       // eslint-disable-next-line no-fallthrough
       case null:
       case undefined: // 兼容copilot接口

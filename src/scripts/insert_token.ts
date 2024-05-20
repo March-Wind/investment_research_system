@@ -8,7 +8,9 @@ async function bootstrap() {
   const autoTokensModule = app.select(OpenAIModule);
   const autoToken = autoTokensModule.get(AutoTokenService);
   // await autoToken.insertCopilotTokenMany();
-  await autoToken.insertTransferTokenMany();
-  console.log(await autoToken.findAll());
+  // await autoToken.insertTransferTokenMany();
+  // console.log(await autoToken.findAll());
+  // @ts-ignore
+  await autoToken.updateCopilotTokenState({ key: 'transfer2', tokenType: 'transfer', kind: 'TransferToken' });
 }
 bootstrap();

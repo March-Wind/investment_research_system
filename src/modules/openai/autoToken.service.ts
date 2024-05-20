@@ -1,11 +1,10 @@
-import { CopilotToken, TransferToken, dbName, collectionName, OpenAiToken } from '@/schema/settings/auto_token';
+import { CopilotToken, TransferToken, dbName, collectionName, OpenAiToken, AutoToken } from '@/schema/settings/auto_token';
 import Elementary from '@/utils/elementary';
 import { randomString } from '@/utils/generatorNunmbers';
 import { awaitWrap, retry } from '@marchyang/enhanced_promise';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-
+import { Model, Types } from 'mongoose';
 // const copilotDefaultHeaders = {
 //   'vscode-machineid': '4b01dcbd455bdb9b67e196b03672a81e9b7fd071a0df0a6bc6c27495e7c3b9e9',
 //   'editor-version': 'vscode/1.86.2',
@@ -26,7 +25,7 @@ export class AutoTokenService {
     @InjectModel(TransferToken.name, dbName)
     private TransferTokenModel: Model<TransferToken>,
     @InjectModel(collectionName, dbName)
-    private autoTokenModel: Model<OpenAiToken>,
+    private autoTokenModel: Model<AutoToken>,
   ) {}
   async insertCopilotTokenMany(): Promise<any> {
     return this.copilotTokenModel.insertMany([
@@ -107,7 +106,7 @@ export class AutoTokenService {
   async insertTransferTokenMany(): Promise<any> {
     return this.TransferTokenModel.insertMany([]);
   }
-  async findAll(): Promise<OpenAiToken[]> {
+  async findAll(): Promise<AutoToken[]> {
     return this.autoTokenModel.find().exec();
   }
   async exchangeCopilotToken(doc: CopilotToken) {
@@ -209,7 +208,9 @@ export class AutoTokenService {
   async tokenScheduler() {
     // const allToken = [this.getIdleCopilotToken.bind(this), this.getIdleTransferToken.bind(this)];
     // 这类能保留类型
-    const allToken: (() => Promise<CopilotToken | TransferToken>)[] = [() => this.getIdleCopilotToken(), () => this.getIdleTransferToken()];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const allToken: (() => Promise<AutoToken>)[] = [() => this.getIdleCopilotToken(), () => this.getIdleTransferToken()];
     for (const channel of allToken) {
       const [tokenInfo] = await awaitWrap(
         retry(channel, {
@@ -232,25 +233,42 @@ export class AutoTokenService {
     }
   }
   async updateCopilotTokenState(
-    tokenInfo: CopilotToken | TransferToken | OpenAiToken,
+    tokenInfo: AutoToken,
     params?: { deleteTokenField?: boolean; rateLimiting?: boolean; exchangeTokenRest?: boolean },
   ) {
     const { deleteTokenField = false, rateLimiting = false, exchangeTokenRest = false } = params || {};
     const currentTime = new Date();
     currentTime.setMinutes(currentTime.getMinutes() + 3);
-    await this.autoTokenModel.updateOne(
-      { key: tokenInfo.key },
-      {
-        keyState: 'idle',
-        ...(deleteTokenField ? { token: '' } : {}),
-        ...(rateLimiting ? { rateLimiting: currentTime } : {}),
-        ...(exchangeTokenRest ? { exChangeTokenRestTime: currentTime } : {}),
-        // times 减一
-        ...(tokenInfo.tokenType === 'transfer' ? { $inc: { times: -1 } } : {}),
-      },
-    );
+    let method: Model<CopilotToken> | Model<TransferToken> | Model<AutoToken>;
+    switch (tokenInfo.kind) {
+      case CopilotToken.name:
+        method = this.copilotTokenModel;
+        break;
+      case TransferToken.name:
+        method = this.TransferTokenModel;
+        break;
+      default:
+        method = this.autoTokenModel;
+        break;
+    }
+    const results = await method
+      .updateOne(
+        { _id: new Types.ObjectId('662776214f487cefd12f05ef') },
+        {
+          keyState: 'idle',
+          ...(deleteTokenField ? { token: '' } : {}),
+          ...(rateLimiting ? { rateLimiting: currentTime } : {}),
+          ...(exchangeTokenRest ? { exChangeTokenRestTime: currentTime } : {}),
+          // // times 减一
+          ...(tokenInfo.tokenType === 'transfer' ? { $inc: { times: -1 } } : {}),
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+    console.log(results);
   }
-  async handleUseError(tokenInfo: CopilotToken | TransferToken | OpenAiToken, errorInfo: string, status: number) {
+  async handleUseError(tokenInfo: AutoToken, errorInfo: string, status: number) {
     if (tokenInfo.tokenType === 'copilot') {
       switch (status) {
         case 401: {

@@ -10,14 +10,16 @@ type Dependence = keyof Dependencies;
 
 interface ChatTask {
   type: 'chat'; // 聊天
-  injectPrompt?: boolean; // 是否注入提示词
   dep?: Dependence[];
+  outMessagesInsertPosition?: number; // 外部messages插入当前的messages的位置, 不写的话，默认是放在最前面
   params: ChatCompletionCreateParams;
+  result?: ChatCompletionCreateParams;
 }
 
 interface ExtractJSONFromTextTask {
   type: 'ExtractJSONFromText';
   dep?: Dependence[];
+  result?: Record<any, any>;
 }
 type Task = ChatTask | ExtractJSONFromTextTask;
 // interface Task {
@@ -34,3 +36,21 @@ type Task = ChatTask | ExtractJSONFromTextTask;
 // type Tasks = NestTasks<Task>;
 type Tasks = Task[];
 export { Tasks, Task, Dependencies, Dependence, ChatTask, ExtractJSONFromTextTask };
+
+export interface AnalysisTargetResult {
+  target: string; // 目标
+  requirement: string; // 要求
+}
+export interface DecomposeStepsResult {
+  expert_roles: string[];
+}
+export interface SearchOutputFormatResult {
+  content: string;
+}
+export interface SearchOutputFormatResult {
+  content: string;
+}
+export interface SubdivideOutputFormatByResult {
+  type: string; // content的细分类型
+  complexity: boolean; // 是否复杂
+}
